@@ -812,6 +812,61 @@ int16_t SX126x::setCodingRate(uint8_t cr) {
   return(setModulationParams(this->spreadingFactor, this->bandwidth, this->codingRate, this->ldrOptimize));
 }
 
+int16_t SX126x::setLoRaModulationParams(float bw, uint8_t sf, uint8_t cr) {
+  // check active modem
+  if(getPacketType() != RADIOLIB_SX126X_PACKET_TYPE_LORA) {
+    return(RADIOLIB_ERR_WRONG_MODEM);
+  }
+
+  // ensure the parameters are in the correct range
+  RADIOLIB_CHECK_RANGE(bw, 0.0, 510.0, RADIOLIB_ERR_INVALID_BANDWIDTH);
+  RADIOLIB_CHECK_RANGE(sf,   5,    12, RADIOLIB_ERR_INVALID_SPREADING_FACTOR);
+  RADIOLIB_CHECK_RANGE(cr,   5,     8, RADIOLIB_ERR_INVALID_CODING_RATE);
+
+  // check allowed bandwidth values
+  uint8_t bw_div2 = bw / 2 + 0.01;
+  switch (bw_div2)  {
+    case 3: // 7.8:
+      this->bandwidth = RADIOLIB_SX126X_LORA_BW_7_8;
+      break;
+    case 5: // 10.4:
+      this->bandwidth = RADIOLIB_SX126X_LORA_BW_10_4;
+      break;
+    case 7: // 15.6:
+      this->bandwidth = RADIOLIB_SX126X_LORA_BW_15_6;
+      break;
+    case 10: // 20.8:
+      this->bandwidth = RADIOLIB_SX126X_LORA_BW_20_8;
+      break;
+    case 15: // 31.25:
+      this->bandwidth = RADIOLIB_SX126X_LORA_BW_31_25;
+      break;
+    case 20: // 41.7:
+      this->bandwidth = RADIOLIB_SX126X_LORA_BW_41_7;
+      break;
+    case 31: // 62.5:
+      this->bandwidth = RADIOLIB_SX126X_LORA_BW_62_5;
+      break;
+    case 62: // 125.0:
+      this->bandwidth = RADIOLIB_SX126X_LORA_BW_125_0;
+      break;
+    case 125: // 250.0
+      this->bandwidth = RADIOLIB_SX126X_LORA_BW_250_0;
+      break;
+    case 250: // 500.0
+      this->bandwidth = RADIOLIB_SX126X_LORA_BW_500_0;
+      break;
+    default:
+      return(RADIOLIB_ERR_INVALID_BANDWIDTH);
+  }
+
+  // update modulation parameters
+  this->bandwidthKhz = bw;
+  this->spreadingFactor = sf;
+  this->codingRate = cr - 4;
+  return(setModulationParams(this->spreadingFactor, this->bandwidth, this->codingRate, this->ldrOptimize));
+}
+
 int16_t SX126x::setSyncWord(uint8_t syncWord, uint8_t controlBits) {
   // check active modem
   if(getPacketType() != RADIOLIB_SX126X_PACKET_TYPE_LORA) {

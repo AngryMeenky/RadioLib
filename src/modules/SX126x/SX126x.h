@@ -689,6 +689,18 @@ class SX126x: public PhysicalLayer {
     int16_t setCodingRate(uint8_t cr);
 
     /*!
+      \brief Sets LoRa bandwidth, spreading factor, and coding rate.
+      Allowed bandwidth values are 7.8, 10.4, 15.6, 20.8, 31.25, 41.7, 62.5, 125.0, 250.0 and 500.0 kHz.
+      Allowed spreading factor values range from 5 to 12.
+      Allowed coding rate values range from 5 to 8.
+      \param bw LoRa bandwidth to be set in kHz.
+      \param sf LoRa spreading factor to be set.
+      \param cr LoRa coding rate denominator to be set.
+      \returns \ref status_codes
+    */
+    int16_t setLoRaModulationParams(float bw, uint8_t sf, uint8_t cr);
+
+    /*!
       \brief Sets LoRa sync word.
       \param syncWord LoRa sync word to be set.
       \param controlBits Undocumented control bits, required for compatibility purposes.
